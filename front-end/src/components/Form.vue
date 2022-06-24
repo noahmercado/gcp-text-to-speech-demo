@@ -16,7 +16,6 @@
         </v-row>
 
         <v-row>
-          <v-spacer></v-spacer>
           <v-col>
             <small>Voice Configuration</small>
           </v-col>
@@ -42,7 +41,7 @@
           <v-spacer></v-spacer>
           <v-col cols="2">
             <v-select v-model="voiceType" :items="voiceTypes" :rules="[v => !!v || 'Voice Type is required']"
-              label="Voice Type" required prepend-icon="mdi-account-voice">
+              label="Voice Type" required prepend-icon="mdi-waveform">
             </v-select>
           </v-col>
           <v-spacer></v-spacer>
@@ -159,10 +158,10 @@
           }))]
       },
       voices() {
-        return [...new Set(Object.keys(this.languages).filter((type) => {
-            return type.startsWith(`${this.dialect}-${this.voiceType}`)
+        return [...new Set(Object.entries(this.languages).filter(([key, value]) => {
+            return key.startsWith(`${this.dialect}-${this.voiceType}`) && value == this.gender
           })
-          .map((name) => {
+          .map(([name]) => {
             return name.split("-")[3]
           }))]
       },
