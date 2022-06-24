@@ -1,0 +1,12 @@
+*.zip
+*.mp3
+node_modules
+.terraform/
+*tfstate*
+.env
+firebase.json
+.firebaserc
+.firebase/
+.vscode/
+test.py
+.backend.lock.yml

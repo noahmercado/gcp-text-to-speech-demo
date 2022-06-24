@@ -1,0 +1,6 @@
+flask==2.1.2
+gunicorn==20.1.0
+flask-wtf==1.0.1
+google-cloud-texttospeech==2.11.1
+flask-bootstrap==3.3.7.1
+flask-cors

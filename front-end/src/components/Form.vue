@@ -1,0 +1,239 @@
+<template>
+  <v-card>
+    <v-container>
+      <v-form ref="form" v-model="valid" lazy-validation>
+        <v-row>
+          <v-col cols="12">
+            <v-textarea v-model="text" color="teal" prepend-icon="mdi-tooltip-text-outline"
+              :rules="[v => !!v || 'Input text is required']">
+              <template v-slot:label>
+                <div>
+                  Text to Synthesize
+                </div>
+              </template>
+            </v-textarea>
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-spacer></v-spacer>
+          <v-col>
+            <small>Voice Configuration</small>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="2">
+            <v-select v-model="language" :items="languageCodes" :rules="[v => !!v || 'Language is required']"
+              label="Language" required prepend-icon="mdi-translate">
+            </v-select>
+          </v-col>
+          <v-spacer></v-spacer>
+          <v-col cols="2">
+            <v-select v-model="dialect" :items="dialects" :rules="[v => !!v || 'Dialect is required']" label="Dialect"
+              required prepend-icon="mdi-map-marker-plus-outline">
+            </v-select>
+          </v-col>
+          <v-spacer></v-spacer>
+          <v-col cols="2">
+            <v-select v-model="gender" :items="genders" :rules="[v => !!v || 'Gemder is required']" label="Gender"
+              required prepend-icon="mdi-gender-male-female">
+            </v-select>
+          </v-col>
+          <v-spacer></v-spacer>
+          <v-col cols="2">
+            <v-select v-model="voiceType" :items="voiceTypes" :rules="[v => !!v || 'Voice Type is required']"
+              label="Voice Type" required prepend-icon="mdi-account-voice">
+            </v-select>
+          </v-col>
+          <v-spacer></v-spacer>
+          <v-col cols="2">
+            <v-select v-model="voice" :items="voices" :rules="[v => !!v || 'Voice is required']" label="Voice" required
+              prepend-icon="mdi-account-voice">
+            </v-select>
+          </v-col>
+          <v-spacer></v-spacer>
+        </v-row>
+
+        <v-row>
+          <v-col>
+            <small>Audio Configuration</small>
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-spacer></v-spacer>
+          <v-col cols="3">
+            <v-select v-model="encoding" :items="encodings" :rules="[v => !!v || 'Audio Encoding is required']"
+              label="Audio Encoding" required prepend-icon="mdi-audio-input-rca" dense>
+            </v-select>
+          </v-col>
+
+          <v-spacer></v-spacer>
+          <v-col cols="3">
+            <v-slider v-model="speed" thumb-label="always" label="Playback Speed" max="4.0" min="0.25" step="0.25"
+              prepend-icon="mdi-play-speed"></v-slider>
+          </v-col>
+
+          <v-spacer></v-spacer>
+          <v-col cols="3">
+            <v-slider v-model="pitch" thumb-label="always" label="Pitch" max="20" min="-20" step="0.50"
+              prepend-icon="mdi-android"></v-slider>
+          </v-col>
+          <v-spacer></v-spacer>
+        </v-row>
+
+        <v-checkbox v-model="storeSynthesis" label="Store synthesis in history" required>
+        </v-checkbox>
+
+        <v-btn :disabled="!valid" color="success" class="mr-4" @click="synthesize">
+          Synthesize
+        </v-btn>
+
+        <v-btn color="error" class="mr-4" @click="reset">
+          Reset
+        </v-btn>
+      </v-form>
+    </v-container>
+  </v-card>
+</template>
+
+<script>
+  export default {
+    name: "SynthesizeForm",
+
+    props: {
+      languages: {
+        default: function () {
+          return null
+        }
+      },
+    },
+    data: () => ({
+      speed: 1.0,
+      pitch: 0.0,
+      text: null,
+      valid: true,
+      language: null,
+      dialect: null,
+      gender: null,
+      voiceType: null,
+      encoding: null,
+      voice: null,
+      encodings: [
+        "LINEAR16",
+        "MP3",
+        "OGG_OPUS",
+        "MULAW",
+        "ALAW"
+      ],
+      storeSynthesis: false,
+    }),
+
+    computed: {
+      languageCodes() {
+        return Object.keys(this.languages).map((name) => {
+          return name.split("-")[0]
+        })
+      },
+      dialects() {
+        return [...new Set(Object.keys(this.languages).map((name) => {
+          let [lang, dial] = name.split("-")
+          return [lang, dial].join("-")
+        }).filter((dial) => {
+          return dial.startsWith(this.language)
+        }))]
+      },
+      genders() {
+        return [...new Set(Object.entries(this.languages).filter(([key]) => {
+          return key.startsWith(this.dialect)
+        }).map(([, value]) => {
+          return value
+        }))]
+      },
+      voiceTypes() {
+        return [...new Set(Object.keys(this.languages).filter((type) => {
+            return type.startsWith(this.dialect)
+          })
+          .map((name) => {
+            return name.split("-")[2]
+          }))]
+      },
+      voices() {
+        return [...new Set(Object.keys(this.languages).filter((type) => {
+            return type.startsWith(`${this.dialect}-${this.voiceType}`)
+          })
+          .map((name) => {
+            return name.split("-")[3]
+          }))]
+      },
+    },
+
+    methods: {
+      async synthesize() {
+        this.$refs.form.validate()
+
+        if (!this.valid) {
+          console.log("Invalid form inputs!")
+          return
+        }
+
+        const requestOptions = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            text: this.text,
+            gender: this.gender,
+            pitch: this.pitch,
+            speakingRate: this.speed,
+            voiceName: `${this.dialect}-${this.voiceType}-${this.voice}`,
+            audioEncoding: this.encoding,
+          })
+        }
+
+        let response = await fetch("/api/synthesize", requestOptions)
+        console.log(response)
+        let blob = await response.blob()
+        console.log(blob)
+
+        var url = URL.createObjectURL(blob)
+        var a = document.createElement('a')
+        a.href = url
+        a.download = response.headers.get('Content-Disposition').split("filename=")[1]
+        document.body.appendChild(a) // we need to append the element to the dom -> otherwise it will not work in firefox
+        a.click()
+        a.remove()
+    },
+    reset() {
+      this.$refs.form.reset()
+      this.speed = 1.0
+    },
+    resetValidation() {
+      this.$refs.form.resetValidation()
+    },
+  },
+  watch: {
+    dialects: function (n) {
+      if (n.length == 1) {
+        this.dialect = this.dialects[0]
+      }
+    },
+    genders: function (n) {
+      if (n.length == 1) {
+        this.gender = this.genders[0]
+      }
+    },
+    voiceTypes: function (n) {
+      if (n.length == 1) {
+        this.voiceType = this.voiceTypes[0]
+      }
+    },
+    voices: function (n) {
+      if (n.length == 1) {
+        this.voice = this.voices[0]
+      }
+    },
+  }
+  }
+</script>
