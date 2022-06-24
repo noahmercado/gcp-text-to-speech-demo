@@ -1,4 +1,4 @@
-# Google Cloud Test-To-Speach Utility
+# Google Cloud Text-To-Speach Utility
 This repository contains the source code for a GCP Text-To-Speach (TTS) Web App hosted on GCP + Firebase.
 
 ## Services
@@ -17,9 +17,9 @@ This repository contains the source code for a GCP Text-To-Speach (TTS) Web App 
     
 ## How to deploy
 ```bash
-git clone githaasdf
+git clone git@gitlab.com:google-cloud-ce/demos/hertz-text-to-speech-web-app.git
 
-cd text-to-speech-demo
+cd hertz-text-to-speech-web-app
 
 # Log in to gcloud cli 
 gcloud auth login
