@@ -17,7 +17,7 @@ This repository contains the source code for a GCP Text-To-Speach (TTS) Web App 
     
 ## How to deploy
 ```bash
-git clone git@gitlab.com:google-cloud-ce/demos/hertz-text-to-speech-web-app.git
+# Clone repo 
 
 cd hertz-text-to-speech-web-app
 

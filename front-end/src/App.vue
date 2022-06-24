@@ -13,7 +13,7 @@
 
         <v-row>
           <v-col>
-            <v-img src="./assets/TTS-Web-App.drawio.svg" alt="Google Text to Speech with Google Cloud Run">
+            <v-img src="./assets/TTS-Web-App.drawio.png" alt="Google Text to Speech with Google Cloud Run">
             </v-img>
           </v-col>
         </v-row>
