@@ -28,6 +28,6 @@ gcloud auth login
 make tf-backend
 
 # Deploy the web App
-make all
+make app
 
 ```

@@ -10,3 +10,6 @@ firebase.json
 .vscode/
 test.py
 .backend.lock.yml
+firestore.rules
+storage.rules
+cors.json

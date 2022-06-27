@@ -21,8 +21,8 @@
       <v-text-field class="mr-5" filled hide-details rounded outlined dense flat dark append-icon="mdi-magnify"></v-text-field>
       <v-spacer></v-spacer>
           <v-avatar class="mr-5">
-            <img :src="user.photoURL" :alt="user.displayName" v-if="user != null">
-            <v-icon dark v-else>fa-user-circle</v-icon>
+            <!-- <img :src="user.photoURL" :alt="user.displayName" v-if="user != null"> -->
+            <v-icon dark >mdi-account-circle</v-icon>
           </v-avatar>
       <v-spacer></v-spacer>
       <v-btn icon>

@@ -2,8 +2,9 @@
 
 import os
 from io import BytesIO
-from google.cloud import texttospeech
+from google.cloud import texttospeech, storage, firestore
 from flask import Flask, request, send_file
+from uuid import uuid4
 from flask_cors import CORS
 
 # Use app for GCP
@@ -12,7 +13,13 @@ app.config['SECRET_KEY'] = 'caugusto-weweax'
 
 CORS(app)
 
-client = texttospeech.TextToSpeechClient()
+ttsClient = texttospeech.TextToSpeechClient()
+gcsClient = storage.Client()
+firestoreClient = firestore.Client()
+
+PORT = int(os.environ.get('PORT', 8080))
+GCS_BUCKET_NAME = os.environ.get('GCS_BUCKET_NAME')
+BUCKET = gcsClient.get_bucket(GCS_BUCKET_NAME)
 
 @app.route('/api/voices', methods=['GET'])
 def get_voices():
@@ -21,7 +28,7 @@ def get_voices():
     """
     # print(path)
     # Get the language list
-    voices = client.list_voices()
+    voices = ttsClient.list_voices()
 
     # Return JSON obj of voice name => gender
     return {voice.name : voice.ssml_gender.name for voice in voices.voices}
@@ -35,6 +42,7 @@ def synthesize():
     print(request)
     # Get the request JSON payload
     payload = request.get_json(silent=True)
+    print(payload)
 
     # Set the text input to be synthesized
     synthesis_input = texttospeech.SynthesisInput(text=payload['text'])
@@ -61,10 +69,11 @@ def synthesize():
 
     # Perform the text-to-speech request on the text input with the selected
     # voice parameters and audio file type
-    response = client.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
+    response = ttsClient.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
 
+    print(response)
     # The response's audio_content is binary so we load it into a file-like 
-    # object to send it back to the client
+    # object to send it back to the ttsClient
     audio_file = BytesIO()
     audio_file.write(response.audio_content)
     audio_file.seek(0)
@@ -95,7 +104,22 @@ def synthesize():
     filename = f'output.{encodings[payload["audioEncoding"]]["extension"]}'
     mimetype = encodings[payload["audioEncoding"]]["mimetype"]
 
+    try:
+        if payload["storeSynthesis"]:
+            upload_id = uuid4()
+            blob_name = f"{upload_id}/{filename}"
+            blob = BUCKET.blob(blob_name)
+            blob.upload_from_string(audio_file.getvalue(), content_type=mimetype)
+
+            doc_ref = firestoreClient.collection(u'history').document(f"{upload_id}")
+            doc_ref.set({
+                **payload,
+                "gcsRef": f"gs://{GCS_BUCKET_NAME}/{blob_name}"
+            })
+    except Exception as e:
+        print(e)
+
     return send_file(audio_file, mimetype=mimetype, as_attachment=True, attachment_filename=filename)
 
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+    app.run(debug=True, host='0.0.0.0', port=PORT)

@@ -1,10 +1,13 @@
-all: check init validate plan apply
-update: plan apply
+app: check init validate plan apply
+update: check plan apply
 
 .PHONY: check
 check:
 	@command -v terraform >/dev/null || ( echo "Terraform is not installed!"; exit 1)
 	@command -v gcloud >/dev/null || ( echo "gcloud CLI is not installed!"; exit 1)
+	@command -v npm >/dev/null || ( echo "npm is not installed!"; exit 1)
+	@command -v gsutil >/dev/null || ( echo "gsutil CLI is not installed!"; exit 1)
+	@command -v curl >/dev/null || ( echo "curl is not installed!"; exit 1)
 
 .PHONY: tf-backend
 tf-backend:
@@ -48,16 +51,16 @@ image-no-cache:
 	cd app; docker build --no-cache -t tts-web-app:latest .
 
 .PHONY: local-frontend
-local-front-end:
+local-frontend:
 	cd front-end; npm run serve
 
 .PHONY: local-backend
 local-backend: image 
-	docker run -it -p 8081:8080 --env PORT=8080 --env ENVIRONMENT=dev --mount type=bind,source="${HOME}/.config/gcloud",target="/root/.config/gcloud" tts-web-app:latest
+	docker run -it -p 8081:8080 --env PORT=8080 --env ENVIRONMENT=dev --env GCS_BUCKET_NAME=tts-utility-354320.appspot.com --env GCLOUD_PROJECT=$(gcloud config get-value project) --mount type=bind,source="${HOME}/.config/gcloud",target="/root/.config/gcloud" tts-web-app:latest
 
 .PHONY: debug-backend
 debug-backend: image
-	docker run -it -p 8081:8080 --env PORT=8080 --mount type=bind,source="${HOME}/.config/gcloud",target="/root/.config/gcloud" tts-web-app:latest /bin/sh
+	docker run -it -p 8081:8080 --env PORT=8080 --env GCS_BUCKET_NAME=tts-utility-354320.appspot.com --mount type=bind,source="${HOME}/.config/gcloud",target="/root/.config/gcloud" tts-web-app:latest /bin/sh
 
 local:
 	make -j 2 local-backend local-frontend

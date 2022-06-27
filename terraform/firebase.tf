@@ -7,9 +7,30 @@ resource "google_app_engine_application" "firestore" {
 resource "google_firebase_project" "this" {
   provider = google-beta
 
-  project = data.google_project.this.project_id
+  project = local.project_id
 
   depends_on = [google_app_engine_application.firestore]
+
+  provisioner "local-exec" {
+    command = <<-EOT
+  curl --location --request PATCH 'https://identitytoolkit.googleapis.com/admin/v2/projects/${local.project_id}/config?updateMask=signIn.anonymous.enabled,autodeleteAnonymousUsers' \
+  --header 'X-Goog-User-Project: ${local.project_id}' \
+  --header 'Authorization: Bearer $FIREBASE_TOKEN' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+      "signIn": {
+          "anonymous": {
+              "enabled": true
+          }
+      },
+      "autodeleteAnonymousUsers": false
+  }'
+  EOT
+
+    environment = {
+      "FIREBASE_TOKEN" = local.access_token
+    }
+  }
 }
 
 resource "google_firebase_project_location" "this" {
@@ -46,6 +67,36 @@ resource "local_file" "firebase_json" {
     ])
   })
   filename = "${local.root_dir}/firebase.json"
+}
+
+resource "local_file" "firestore_rules" {
+
+  content  = file("${path.module}/templates/firestore.rules.tftpl")
+  filename = "${local.root_dir}/config/firestore.rules"
+}
+
+resource "local_file" "storage_rules" {
+
+  content  = file("${path.module}/templates/storage.rules.tftpl")
+  filename = "${local.root_dir}/config/storage.rules"
+}
+
+resource "local_file" "bucket_cors" {
+
+  content = templatefile("${path.module}/templates/cors.json.tftpl", {
+    ORIGIN = jsonencode([
+      "https://${local.project_id}.firebaseapp.com",
+      "https://${local.project_id}.web.app"
+    ])
+  })
+  filename = "${local.root_dir}/config/cors.json"
+
+  provisioner "local-exec" {
+    command = "gsutil cors set ${local.root_dir}/config/cors.json gs://${local.web_app_config["storageBucket"]}"
+    environment = {
+      "CLOUDSDK_AUTH_ACCESS_TOKEN" = local.access_token
+    }
+  }
 }
 
 resource "local_file" "firebase_rc" {
@@ -115,7 +166,7 @@ resource "null_resource" "deploy_web_app" {
     command     = "firebase deploy"
 
     environment = {
-      "FIREBASE_TOKEN" = "${data.google_client_config.current.access_token}"
+      "FIREBASE_TOKEN" = local.access_token
     }
   }
 

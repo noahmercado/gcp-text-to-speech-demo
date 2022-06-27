@@ -40,6 +40,10 @@ resource "google_cloud_run_service" "this" {
     spec {
       containers {
         image = local.container_image
+        env {
+          name  = "GCS_BUCKET_NAME"
+          value = local.web_app_config["storageBucket"]
+        }
       }
       service_account_name = google_service_account.tts_web_app.email
     }
