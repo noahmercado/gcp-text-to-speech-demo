@@ -1,4 +1,4 @@
-# Google Cloud Text-To-Speach Utility
+# Google Cloud Text-To-Speach Web App
 This repository contains the source code for a GCP Text-To-Speach (TTS) Web App hosted on GCP + Firebase. Deployment instructions can be found below.
 
 # Google Disclaimer
