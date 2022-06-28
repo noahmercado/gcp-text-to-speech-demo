@@ -29,7 +29,7 @@ This repository contains the source code for a GCP Text-To-Speach (TTS) Web App 
 ## Required GCP APIs
 All GCP APIs required for this solution are documented in [./config/apis.txt](./config/apis.txt). By default, `make tf-backend` will enable each of these APIs
   
-  
+
 ## Organization Policies
 This solution deploys service accounts as well as a public Cloud Run service, which often tend to be blocked by some organizations via Org Policies. The Org Policy constraints which could prevent this solution from being deployed are documented in [./config/disable_boolean_constraint_policies.txt](./config/disable_boolean_constraint_policies.txt) and [./config/disable_list_constraint_policies.txt](./config/disable_list_constraint_policies.txt). If your deployment is being blocked, uncomment line #99 in [./scripts/create_tf_backend.sh](./scripts/create_tf_backend.sh) and rerun `make tf-backend`. Please note that you must have permissions to remove Orgnization Policies from your project in order for this to work.
    
@@ -59,5 +59,8 @@ make clean
 ```
   
 ## Front End Screenshots
+### Synthesize Tab  
 ![Synthesize](./assets/synthesize_view.png "Synthesize")  
+  
+### History Tab
 ![History](./assets/history_view.png "History")
