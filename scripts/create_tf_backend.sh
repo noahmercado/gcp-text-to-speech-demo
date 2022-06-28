@@ -40,10 +40,10 @@ function disable_policies() {
         gcloud alpha --quiet resource-manager org-policies disable-enforce ${POLICY} --project=${PROJECT_ID} > /dev/null 2>&1
     done <"$ROOT_DIR/config/disable_boolean_constraint_policies.txt"
 
-    # while IFS= read -r POLICY; do
-    #     echo "Disabling $POLICY in ${PROJECT_ID}..."
-    #     gcloud alpha --quiet resource-manager org-policies allow ${POLICY} --project=${PROJECT_ID} > /dev/null 2>&1
-    # done <"$ROOT_DIR/config/disable_list_constraint_policies.txt"
+    while IFS= read -r POLICY; do
+        echo "Disabling $POLICY in ${PROJECT_ID}..."
+        gcloud --quiet org-policies reset ${POLICY} --project=${PROJECT_ID} > /dev/null 2>&1
+    done <"$ROOT_DIR/config/disable_list_constraint_policies.txt"
 
     echo "Allowing time to propagate..."
     sleep 180

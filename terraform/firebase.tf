@@ -12,20 +12,21 @@ resource "google_firebase_project" "this" {
   depends_on = [google_app_engine_application.firestore]
 
   provisioner "local-exec" {
+    # Enable the "Anonymous" Sign-in provider with Firebase Auth
     command = <<-EOT
-  curl --location --request PATCH 'https://identitytoolkit.googleapis.com/admin/v2/projects/${local.project_id}/config?updateMask=signIn.anonymous.enabled,autodeleteAnonymousUsers' \
-  --header 'X-Goog-User-Project: ${local.project_id}' \
-  --header 'Authorization: Bearer $FIREBASE_TOKEN' \
-  --header 'Content-Type: application/json' \
-  --data-raw '{
-      "signIn": {
-          "anonymous": {
-              "enabled": true
-          }
-      },
-      "autodeleteAnonymousUsers": false
-  }'
-  EOT
+    curl --location --request PATCH 'https://identitytoolkit.googleapis.com/admin/v2/projects/${local.project_id}/config?updateMask=signIn.anonymous.enabled,autodeleteAnonymousUsers' \
+    --header 'X-Goog-User-Project: ${local.project_id}' \
+    --header 'Authorization: Bearer $FIREBASE_TOKEN' \
+    --header 'Content-Type: application/json' \
+    --data-raw '{
+        "signIn": {
+            "anonymous": {
+                "enabled": true
+            }
+        },
+        "autodeleteAnonymousUsers": false
+    }'
+EOT
 
     environment = {
       "FIREBASE_TOKEN" = local.access_token

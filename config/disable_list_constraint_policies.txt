@@ -1,2 +1,1 @@
-constraints/compute.vmCanIpForward
 constraints/iam.allowedPolicyMemberDomains
