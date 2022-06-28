@@ -85,10 +85,7 @@ resource "local_file" "storage_rules" {
 resource "local_file" "bucket_cors" {
 
   content = templatefile("${path.module}/templates/cors.json.tftpl", {
-    ORIGIN = jsonencode([
-      "https://${local.project_id}.firebaseapp.com",
-      "https://${local.project_id}.web.app"
-    ])
+    ORIGIN = jsonencode(local.firebase_domains)
   })
   filename = "${local.root_dir}/config/cors.json"
 

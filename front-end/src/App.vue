@@ -48,10 +48,7 @@
     onAuthStateChanged
   } from "firebase/auth"
 
-
   import {
-    // db,
-    // storage,
     auth
   } from "./shared/firebaseConfig"
 
@@ -85,8 +82,13 @@
             console.log(error)
           })
       },
-      getVoices() {
-        fetch("/api/voices")
+      async getVoices() {
+
+        let token = await this.user.getIdToken()
+        let headers = {
+          Authorization: `Bearer ${token}`
+        }
+        fetch("/api/voices", {headers: headers})
           .then((res) => res.json())
           .then((data) => {
             console.log(data)
@@ -99,13 +101,13 @@
       }
     },
     created() {
-      this.getVoices()
       this.login()
       onAuthStateChanged(auth, (user) => {
         if (user) {
           // User is signed in, see docs for a list of available properties
           // https://firebase.google.com/docs/reference/js/firebase.User
           this.user = user
+          this.getVoices()
           // ...
         } else {
           this.user = {}

@@ -53,7 +53,6 @@ function create_bucket() {
     echo "Creating bucket ${BUCKET_NAME_WITH_PROTO} in ${PROJECT_ID} within us-central1 ..."
     gsutil mb -c standard -b on -l us-central1 $BUCKET_NAME_WITH_PROTO  > /dev/null 2>&1 && \
         gsutil versioning set on $BUCKET_NAME_WITH_PROTO
-    sed -i '' "s/TERRAFORM_BACKEND_BUCKET_NAME/${BUCKET_NAME}/g" "${ROOT_DIR}/terraform/main.tf"
 }
 
 function create_service_account() {

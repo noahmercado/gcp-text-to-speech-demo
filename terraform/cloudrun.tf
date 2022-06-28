@@ -44,13 +44,29 @@ resource "google_cloud_run_service" "this" {
           name  = "GCS_BUCKET_NAME"
           value = local.web_app_config["storageBucket"]
         }
+
+        env {
+          name  = "FIREBASE_DOMAINS"
+          value = join(",", local.firebase_domains)
+        }
+
+        env {
+          name  = "BROWSER_CACHE_TTL"
+          value = var.browser-cache-ttl
+        }
+
+        env {
+          name  = "CDN_CACHE_TTL"
+          value = var.cdn-cache-ttl
+        }
+
       }
       service_account_name = google_service_account.tts_web_app.email
     }
 
     metadata {
       annotations = {
-        "autoscaling.knative.dev/maxScale" = "1000"
+        "autoscaling.knative.dev/maxScale" = tostring(var.cloud-run-max-scale)
         "run.googleapis.com/client-name"   = "terraform"
       }
     }

@@ -1,17 +1,23 @@
 #!/usr/bin/env python3
 
-import os
+import os, json
 from io import BytesIO
 from google.cloud import texttospeech, storage, firestore
 from flask import Flask, request, send_file
 from uuid import uuid4
 from flask_cors import CORS
+import functools
+from firebase_admin import auth, initialize_app
 
 # Use app for GCP
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'caugusto-weweax'
+fb_app = initialize_app()
 
-CORS(app)
+FIREBASE_DOMAINS = os.environ.get("FIREBASE_DOMAINS", "").split(",")
+BROWSER_CACHE_TTL = int(os.environ.get("BROWSER_CACHE_TTL", 300))
+CDN_CACHE_TTL = int(os.environ.get("CDN_CACHE_TTL", 3600))
+
+cors = CORS(app, resources={r"/api/*": {"origins": FIREBASE_DOMAINS}})
 
 ttsClient = texttospeech.TextToSpeechClient()
 gcsClient = storage.Client()
@@ -21,19 +27,47 @@ PORT = int(os.environ.get('PORT', 8080))
 GCS_BUCKET_NAME = os.environ.get('GCS_BUCKET_NAME')
 BUCKET = gcsClient.get_bucket(GCS_BUCKET_NAME)
 
+def requires_auth(func):
+    @functools.wraps(func)
+    def decorated_function(*args, **kwargs):
+        bearer = request.headers.get("Authorization")
+        if not bearer:
+            return {"error": "Unauthorized"}, 401
+        token = bearer.split()[1]
+        try:
+            decoded_token = auth.verify_id_token(token)
+        except Exception as e:
+            print(f"Error verifying token: ")
+            print(e)
+            return {"error": "Forbidden"}, 403
+
+        print(f"Handling authenticated request from: {json.dumps(decoded_token)}")
+        return func(*args, **kwargs)
+
+    return decorated_function
+
 @app.route('/api/voices', methods=['GET'])
+@requires_auth
 def get_voices():
     """
     Route to display home page and form to receive text from user for speech synthesis.
     """
-    # print(path)
+    print(request)
     # Get the language list
     voices = ttsClient.list_voices()
 
-    # Return JSON obj of voice name => gender
-    return {voice.name : voice.ssml_gender.name for voice in voices.voices}
+    headers = {
+        "Cache-Control": f"public, max-age={BROWSER_CACHE_TTL}, s-maxage={CDN_CACHE_TTL}"
+    }
+
+    # JSON obj of voice name => gender
+    json_response = {voice.name : voice.ssml_gender.name for voice in voices.voices}
+
+    # Return json + 200 http code + cache contorl headers
+    return json_response, 200, headers
 
 @app.route('/api/synthesize', methods=['POST'])
+@requires_auth
 def synthesize():
     """
     Route to synthesize speech using Google Text-to-Speech API.

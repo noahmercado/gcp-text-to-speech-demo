@@ -202,10 +202,12 @@
           return
         }
 
+        let token = await this.user.getIdToken()
         const requestOptions = {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
           },
           body: JSON.stringify({
             text: this.text,

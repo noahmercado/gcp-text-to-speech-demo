@@ -8,6 +8,10 @@ locals {
   container_image = "gcr.io/${data.google_project.this.project_id}/tts-web-app:${data.archive_file.service.output_sha}"
   access_token    = data.google_client_config.current.access_token
   project_id      = data.google_project.this.project_id
+  firebase_domains = [
+    "https://${local.project_id}.firebaseapp.com",
+    "https://${local.project_id}.web.app"
+  ]
 
   web_app_config = sensitive({
     appId             = google_firebase_web_app.this.app_id

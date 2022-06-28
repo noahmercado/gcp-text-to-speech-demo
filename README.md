@@ -13,13 +13,15 @@ This repository contains the source code for a GCP Text-To-Speach (TTS) Web App 
 - `roles/editor`
   
 ## Dependencies
-- terraform
-- gcloud cli
-- gsutil cli
-- firebase cli
-- nodejs & npm
-- curl
-  
+
+- `terraform >= 1.0.0`
+- `gcloud cli >= 385.0.0`
+- `gsutil cli >= 5.10`
+- `firebase cli >= 10.4.2`
+- `nodejs >= v18.1.0`
+- `npm >= 8.8.0`
+- `curl >= 7.79.1`
+
 ## Architecture 
 ![ARCHITECTURE](./assets/TTS-Web-App.drawio.png "Architecture")  
   
@@ -29,6 +31,8 @@ This repository contains the source code for a GCP Text-To-Speach (TTS) Web App 
 # Clone repo 
 
 cd gcp-text-to-speech-demo
+
+# Review the default configuration in variables.tfvars and modify as needed
 
 # Log in to gcloud cli 
 gcloud auth login

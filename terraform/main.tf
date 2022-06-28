@@ -1,6 +1,5 @@
 terraform {
   backend "gcs" {
-    bucket = "tts-utility-354320-tf-backend-4029"
     prefix = "terraform/modules/tts-web-app/state"
   }
 }

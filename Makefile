@@ -1,3 +1,5 @@
+BACKEND_BUCKET:=$$(grep 'bucket:' ./config/.backend.lock.yml | cut -d ':' -f 2 | tr -d '"' | tr -d '[:space:]')
+
 app: check init validate plan apply
 update: check plan apply
 
@@ -19,7 +21,7 @@ fmt:
 
 .PHONY: init
 init:
-	terraform -chdir=terraform init
+	terraform -chdir=terraform init -backend-config="bucket=${BACKEND_BUCKET}"
 
 .PHONY: validate
 validate:

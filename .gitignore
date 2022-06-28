@@ -13,3 +13,5 @@ test.py
 firestore.rules
 storage.rules
 cors.json
+.DS_Store
+*.log
