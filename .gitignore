@@ -1,17 +1,22 @@
+# These files and dirs should never be committed to git
 *.zip
 *.mp3
 node_modules
 .terraform/
 *tfstate*
 .env
-firebase.json
-.firebaserc
 .firebase/
 .vscode/
 test.py
+.DS_Store
+*.log
+
+# After forking this repository, you should comment out the below
+# ignore list so that they can be commited to your VCS
+.terraform.lock.hcl
 .backend.lock.yml
+firebase.json
+.firebaserc
 firestore.rules
 storage.rules
 cors.json
-.DS_Store
-*.log

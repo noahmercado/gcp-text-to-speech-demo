@@ -94,9 +94,9 @@ trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
 # echo an error message before exiting
 trap 'echo "\"${last_command}\" command exited with exit code $?."' EXIT
 
-validate_backend_exists
 enable_apis
 # disable_policies
+validate_backend_exists
 create_bucket
 create_service_account
 generate_config_file

@@ -16,6 +16,12 @@
                 </v-textarea>
               </v-col>
             </v-row>
+            <v-row dense>
+              <v-col class="d-flex" cols="12">
+                <v-spacer></v-spacer>
+                <v-switch v-model="ssml" label="SSML" color="orange"></v-switch>
+              </v-col>
+            </v-row>
 
             <v-row>
               <v-col>
@@ -96,12 +102,11 @@
           </v-form>
         </v-col>
       </v-row>
-      <v-row v-if="media != null">
+      <v-row v-if="media != null" justify="center" align="center" dense>
         <v-col>
           <v-btn color="blue" class="mr-4" @click="download">
             <v-icon color="white">mdi-download-circle-outline</v-icon>
           </v-btn>
-
           <audio controls v-if="playableAudio">
             <source :src="this.media.url" :type="this.media.mimetype">
             Your browser does not support the audio element.
@@ -134,6 +139,7 @@
       text: null,
       media: null,
       valid: true,
+      ssml: false,
       language: null,
       dialect: null,
       gender: null,
@@ -217,7 +223,8 @@
             voiceName: `${this.dialect}-${this.voiceType}-${this.voice}`,
             audioEncoding: this.encoding,
             storeSynthesis: this.storeSynthesis,
-            userId: this.user.uid
+            userId: this.user.uid,
+            ssml: this.ssml
           })
         }
 

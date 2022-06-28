@@ -12,7 +12,7 @@ check:
 	@command -v curl >/dev/null || ( echo "curl is not installed!"; exit 1)
 
 .PHONY: tf-backend
-tf-backend:
+tf-backend: check
 	@./scripts/create_tf_backend.sh
 
 .PHONY: fmt

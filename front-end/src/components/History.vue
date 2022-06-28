@@ -14,7 +14,7 @@
 
           <v-list-item-content>
             <v-list-item-title v-text="item.text"></v-list-item-title>
-            <v-list-item-subtitle>{{item.voiceName}} - {{item.gender}} - {{item.audioEncoding}}</v-list-item-subtitle>
+            <v-list-item-subtitle>{{item.voiceName}} - {{item.gender}} - {{item.audioEncoding}} {{item.ssml ? "- SSML" : "- TEXT"}}</v-list-item-subtitle>
           </v-list-item-content>
 
           <v-list-item-action>

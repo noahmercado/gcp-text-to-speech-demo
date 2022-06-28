@@ -7,7 +7,9 @@ from flask import Flask, request, send_file
 from uuid import uuid4
 from flask_cors import CORS
 import functools
-from firebase_admin import auth, initialize_app
+from firebase_admin import initialize_app
+from firebase_admin.auth import verify_id_token
+from firebase_admin.firestore import SERVER_TIMESTAMP as FIRESTORE_SERVER_TIMESTAMP
 
 # Use app for GCP
 app = Flask(__name__)
@@ -35,7 +37,7 @@ def requires_auth(func):
             return {"error": "Unauthorized"}, 401
         token = bearer.split()[1]
         try:
-            decoded_token = auth.verify_id_token(token)
+            decoded_token = verify_id_token(token)
         except Exception as e:
             print(f"Error verifying token: ")
             print(e)
@@ -79,7 +81,12 @@ def synthesize():
     print(payload)
 
     # Set the text input to be synthesized
-    synthesis_input = texttospeech.SynthesisInput(text=payload['text'])
+    synthesis_input = texttospeech.SynthesisInput()
+
+    if payload["ssml"]:
+        synthesis_input.ssml = payload["text"]
+    else:
+        synthesis_input.text = payload['text']
 
     # Build the voice request, select the language code (i.e. "en-US") and the ssml
     # voice gender (i.e. "MALE")
@@ -148,6 +155,7 @@ def synthesize():
             doc_ref = firestoreClient.collection(u'history').document(f"{upload_id}")
             doc_ref.set({
                 **payload,
+                "timestamp": FIRESTORE_SERVER_TIMESTAMP,
                 "gcsRef": f"gs://{GCS_BUCKET_NAME}/{blob_name}"
             })
     except Exception as e:
