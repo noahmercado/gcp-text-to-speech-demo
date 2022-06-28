@@ -1,0 +1,11 @@
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+    function signedIn() {
+      return request.auth.uid != null;
+    }
+      allow read: if signedIn();
+    }
+  }
+}
+
