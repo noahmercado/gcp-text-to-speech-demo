@@ -109,7 +109,7 @@ def synthesize():
         pitch=payload.get("pitch", 0.0))
 
     if payload.get("sampleHertzRate"):
-        print(f'Using sampleHertzRate: {json.dumps(payload["sampleHertzRate"])}')
+        print(f'Using sampleHertzRate: {payload["sampleHertzRate"]}')
         audio_config.sample_rate_hertz = int(payload["sampleHertzRate"])
 
     if payload.get("effectsProfileId"):
