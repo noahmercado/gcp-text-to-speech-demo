@@ -94,7 +94,7 @@
               <v-spacer></v-spacer>
               <v-col cols="4">
                 <v-select v-model="effects" :items="effectsOptions" multiple label="Audio Effects Profiles"
-                  prepend-icon="mdi-audio-input-rca">
+                  prepend-icon="mdi-cast-audio">
                   <template #selection="{ item }">
                     <v-chip color="primary" close draggable @click:close="deleteEffect(item)">{{item}}</v-chip>
                   </template>
@@ -104,7 +104,7 @@
 
               <v-col cols="4">
                 <v-text-field v-model="sampleHertzRate" label="Sample Hertz Rate" type="number" clearable
-                  :rules="sampleHertzValidationRules"
+                  :rules="sampleHertzValidationRules"  prepend-icon="mdi-sine-wave"
                 ></v-text-field>
               </v-col>
               <v-spacer></v-spacer>
