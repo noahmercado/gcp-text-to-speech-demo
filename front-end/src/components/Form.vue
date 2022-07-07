@@ -103,7 +103,7 @@
               <v-spacer></v-spacer>
 
               <v-col cols="4">
-                <v-text-field v-model="sampleHertzRate" label="Sample Hertz Rate" type="number" clearable
+                <v-text-field v-model="sampleHertzRate" label="Sample Rate (Hz)" type="number" clearable
                   :rules="sampleHertzValidationRules"  prepend-icon="mdi-sine-wave"
                 ></v-text-field>
               </v-col>
@@ -168,8 +168,8 @@
       encoding: null,
       voice: null,
       sampleHertzValidationRules: [
-        v => (8000 <= v || v == null) || 'Sample Hertz must be empty or >= 8000',
-        v => (v <= 22579200 || v == null) || 'Sample Hertz must be empty or <= 22579200'
+        v => (8000 <= v || v == null) || 'Sample rate must be empty or >= 8000',
+        v => (v <= 48000 || v == null) || 'Sample rate must be empty or <= 48000'
       ],
       sampleHertzRate: null,
       colors: [
