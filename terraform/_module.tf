@@ -24,10 +24,3 @@ terraform {
   }
   required_version = ">= 1.0.0"
 }
-
-locals {
-  migration_plan        = yamldecode(file("ledgermonolith-migration.yaml"))
-  migration_spec        = local.migration_plan["spec"]
-  merged_spec           = merge(local.migration_spec, { "dataVolumes" = [{ "folders" = ["/var/lib/postgresql"] }] })
-  merged_migration_plan = merge({ "spec" = local.merged_spec }, { for k, v in local.migration_plan : k => v if k != "spec" })
-}
