@@ -86,6 +86,27 @@
                 <v-slider v-model="pitch" thumb-label="always" label="Pitch" max="20" min="-20" step="0.50"
                   prepend-icon="mdi-android"></v-slider>
               </v-col>
+
+              <v-spacer></v-spacer>
+            </v-row>
+
+            <v-row>
+              <v-spacer></v-spacer>
+              <v-col cols="4">
+                <v-select v-model="effects" :items="effectsOptions" multiple label="Audio Effects Profiles"
+                  prepend-icon="mdi-audio-input-rca">
+                  <template #selection="{ item }">
+                    <v-chip color="primary" close draggable @click:close="deleteEffect(item)">{{item}}</v-chip>
+                  </template>
+                </v-select>
+              </v-col>
+              <v-spacer></v-spacer>
+
+              <v-col cols="4">
+                <v-text-field v-model="sampleHertzRate" label="Sample Hertz Rate" type="number" clearable
+                  :rules="sampleHertzValidationRules"
+                ></v-text-field>
+              </v-col>
               <v-spacer></v-spacer>
             </v-row>
 
@@ -146,6 +167,28 @@
       voiceType: null,
       encoding: null,
       voice: null,
+      sampleHertzValidationRules: [
+        v => (8000 <= v || v == null) || 'Sample Hertz must be empty or >= 8000',
+        v => (v <= 22579200 || v == null) || 'Sample Hertz must be empty or <= 22579200'
+      ],
+      sampleHertzRate: null,
+      colors: [
+        "primary",
+        "success",
+        "error",
+        "orange"
+      ],
+      effects: [],
+      effectsOptions: [
+        "wearable-class-device",
+        "handset-class-device",
+        "headphone-class-device",
+        "small-bluetooth-speaker-class-device",
+        "medium-bluetooth-speaker-class-device",
+        "large-home-entertainment-class-device",
+        "large-automotive-class-device",
+        "telephony-class-application"
+      ],
       encodings: [
         "LINEAR16",
         "MP3",
@@ -199,6 +242,13 @@
     },
 
     methods: {
+      randomColor() {
+        let randomIdx = Math.floor(Math.random() * ((this.colors.length - 1) - 0) + 0)
+        let color = this.colors[randomIdx]
+        console.log(randomIdx)
+        console.log(color)
+        return color
+      },
       async synthesize() {
         this.$refs.form.validate()
         this.media = null
@@ -208,6 +258,7 @@
           return
         }
 
+        this.$emit("loading", true)
         let token = await this.user.getIdToken()
         const requestOptions = {
           method: "POST",
@@ -224,12 +275,20 @@
             audioEncoding: this.encoding,
             storeSynthesis: this.storeSynthesis,
             userId: this.user.uid,
-            ssml: this.ssml
+            ssml: this.ssml,
+            effectsProfileId: this.effects,
+            sampleHertzRate: this.sampleHertzRate,
           })
         }
 
         let response = await fetch("/api/synthesize", requestOptions)
         console.log(response)
+
+        if (response.status != 200){
+          console.log("Error synthesizing input!")
+          return
+        }
+
         let blob = await response.blob()
         console.log(blob)
 
@@ -238,6 +297,13 @@
           mimetype: response.headers.get('content-type'),
           filename: response.headers.get('content-disposition').split("filename=")[1],
         }
+
+        this.$emit("loading", false)
+      },
+      deleteEffect(item) {
+        this.effects = this.effects.filter((effect) => {
+          return effect != item
+        })
       },
       reset() {
         this.$refs.form.reset()

@@ -27,7 +27,7 @@ resource "null_resource" "build_image" {
   provisioner "local-exec" {
 
     working_dir = "${local.root_dir}/app"
-    command     = "gcloud builds submit --region=${var.region} --tag ${local.container_image}"
+    command     = "gcloud builds submit --region=${var.region} --tag ${local.container_image} --project ${local.project_id}"
   }
 }
 

@@ -1,13 +1,13 @@
 <template>
   <v-app>
-    <AppBar :drawer="drawer" @onDrawerClick="onDrawerClick" :user="user" @tabSelected="onTabSelect"/>
+    <AppBar :drawer="drawer" @onDrawerClick="onDrawerClick" :user="user" @tabSelected="onTabSelect" />
     <NavDrawer :drawer="drawer" @onDrawerClick="onDrawerClick" />
 
     <v-main>
       <v-container v-show="currentTab=='Synthesize'">
         <v-row>
           <v-col>
-            <SynthesizeForm :languages="ttsLanguages" :user="user" />
+            <SynthesizeForm :languages="ttsLanguages" :user="user" @loading="onFormLoading"/>
           </v-col>
         </v-row>
 
@@ -21,7 +21,7 @@
       <v-container v-show="currentTab=='History'">
         <v-row v-if="user.uid">
           <v-col>
-            <History :user="user"/>
+            <History :user="user" />
           </v-col>
         </v-row>
 
@@ -31,6 +31,10 @@
             </v-img>
           </v-col>
         </v-row>
+
+        <v-overlay :value="loading">
+          <v-progress-circular indeterminate size="64"></v-progress-circular>
+        </v-overlay>
       </v-container>
     </v-main>
 
@@ -68,11 +72,16 @@
       user: {},
       currentTab: "Synthesize",
       ttsLanguages: {},
+      loading: false,
     }),
 
     methods: {
       onDrawerClick(v) {
         this.drawer = v
+      },
+      onFormLoading(v) {
+        console.log(v)
+        this.loading = v
       },
       login() {
         signInAnonymously(auth)
@@ -84,15 +93,19 @@
       },
       async getVoices() {
 
+        this.loading = true
         let token = await this.user.getIdToken()
         let headers = {
           Authorization: `Bearer ${token}`
         }
-        fetch("/api/voices", {headers: headers})
+        fetch("/api/voices", {
+            headers: headers
+          })
           .then((res) => res.json())
           .then((data) => {
             console.log(data)
             this.ttsLanguages = data
+            this.loading = false
           })
       },
       onTabSelect(tab) {

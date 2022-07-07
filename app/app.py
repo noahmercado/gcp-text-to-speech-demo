@@ -108,6 +108,14 @@ def synthesize():
         speaking_rate=payload.get("speakingRate", 1.0),
         pitch=payload.get("pitch", 0.0))
 
+    if payload.get("sampleHertzRate"):
+        print(f'Using sampleHertzRate: {json.dumps(payload["sampleHertzRate"])}')
+        audio_config.sample_rate_hertz = int(payload["sampleHertzRate"])
+
+    if payload.get("effectsProfileId"):
+        print(f'Using Audio effects: {json.dumps(payload["effectsProfileId"])}')
+        audio_config.effects_profile_id = payload["effectsProfileId"]
+
     # Perform the text-to-speech request on the text input with the selected
     # voice parameters and audio file type
     response = ttsClient.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
