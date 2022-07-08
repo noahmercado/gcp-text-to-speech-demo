@@ -1,5 +1,5 @@
 # Google Cloud Text-To-Speech Web App
-This repository contains the source code for a GCP Text-To-Speach (TTS) Web App hosted on GCP + Firebase. Deployment instructions can be found below.
+This repository contains the source code for a GCP Text-To-Speech (TTS) Web App hosted on GCP + Firebase. Deployment instructions can be found below.
 
 # Google Disclaimer
 This is not an officially supported Google product
