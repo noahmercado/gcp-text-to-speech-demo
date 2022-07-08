@@ -39,6 +39,7 @@ This solution deploys service accounts as well as a public Cloud Run service, wh
 ## How to deploy
 ```bash
 # Clone repo 
+git clone git@github.com:noahmercado/gcp-text-to-speech-demo.git
 
 cd gcp-text-to-speech-demo
 
