@@ -56,6 +56,8 @@ make tf-backend
 # Deploy the web App
 make app
 
+# Use the URL and instructions outputted by Terraform to enable Anonymous Auth in the Firebase console. Once complete your Web App is live and ready to use!
+
 # Optional cleanup of any remaining artifacts
 make clean
 
