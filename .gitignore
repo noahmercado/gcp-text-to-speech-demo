@@ -4,6 +4,7 @@
 node_modules
 .terraform/
 *tfstate*
+tfplan
 .env
 .firebase/
 .vscode/
