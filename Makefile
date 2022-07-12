@@ -1,4 +1,5 @@
 BACKEND_BUCKET:=$$(grep 'bucket:' ./config/.backend.lock.yml | cut -d ':' -f 2 | tr -d '"' | tr -d '[:space:]')
+SERVICE_ACCOUNT:=$$(grep 'serviceAccount:' ./config/.backend.lock.yml | cut -d ':' -f 2 | tr -d '"' | tr -d '[:space:]')
 
 app: check init validate plan apply
 update: check plan apply
@@ -21,7 +22,7 @@ fmt:
 
 .PHONY: init
 init:
-	terraform -chdir=terraform init -backend-config="bucket=${BACKEND_BUCKET}"
+	terraform -chdir=terraform init -backend-config="bucket=${BACKEND_BUCKET}" -backend-config="impersonate_service_account=${SERVICE_ACCOUNT}"
 
 .PHONY: validate
 validate:

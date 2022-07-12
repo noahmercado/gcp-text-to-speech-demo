@@ -31,11 +31,10 @@
             </v-img>
           </v-col>
         </v-row>
-
+      </v-container>
         <v-overlay :value="loading">
           <v-progress-circular indeterminate size="64"></v-progress-circular>
         </v-overlay>
-      </v-container>
     </v-main>
 
   </v-app>
