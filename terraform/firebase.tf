@@ -149,7 +149,7 @@ resource "null_resource" "build_web_app" {
 
   provisioner "local-exec" {
     working_dir = "${local.root_dir}/front-end"
-    command     = "npm run build"
+    command     = "NODE_OPTIONS=--openssl-legacy-provider npm run build"
   }
 
   depends_on = [data.archive_file.front_end]
